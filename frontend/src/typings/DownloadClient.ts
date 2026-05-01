@@ -21,6 +21,11 @@ interface DownloadClient extends ModelBase {
   configContract: string;
   infoLink: string;
   tags: number[];
+  supportsCategories?: boolean;
+  categories?: Array<{
+    clientCategory: string;
+    categories: number[];
+  }>;
 }
 
 export default DownloadClient;

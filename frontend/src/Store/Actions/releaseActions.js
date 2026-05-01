@@ -43,6 +43,7 @@ export const defaultState = {
     searchQuery: '',
     searchIndexerIds: [],
     searchCategories: [],
+    searchClientCategoryOverride: '',
     searchLimit: 100,
     searchOffset: 0
   },
@@ -297,6 +298,11 @@ export const actionHandlers = handleThunks({
 
   [GRAB_RELEASE]: function(getState, payload, dispatch) {
     const guid = payload.guid;
+    const clientCategoryOverride = getState().releases.defaults.searchClientCategoryOverride || null;
+    const requestPayload = {
+      ...payload,
+      clientCategoryOverride: payload.clientCategoryOverride ?? clientCategoryOverride
+    };
 
     dispatch(updateRelease({ guid, isGrabbing: true }));
 
@@ -304,7 +310,7 @@ export const actionHandlers = handleThunks({
       url: '/search',
       method: 'POST',
       contentType: 'application/json',
-      data: JSON.stringify(payload)
+      data: JSON.stringify(requestPayload)
     }).request;
 
     promise.done((data) => {
@@ -355,6 +361,12 @@ export const actionHandlers = handleThunks({
   },
 
   [BULK_GRAB_RELEASES]: function(getState, payload, dispatch) {
+    const clientCategoryOverride = getState().releases.defaults.searchClientCategoryOverride || null;
+    const requestPayload = payload.map((release) => ({
+      ...release,
+      clientCategoryOverride: release.clientCategoryOverride ?? clientCategoryOverride
+    }));
+
     dispatch(set({
       section,
       isGrabbing: true
@@ -364,7 +376,7 @@ export const actionHandlers = handleThunks({
       url: '/search/bulk',
       method: 'POST',
       contentType: 'application/json',
-      data: JSON.stringify(payload)
+      data: JSON.stringify(requestPayload)
     }).request;
 
     promise.done((data) => {

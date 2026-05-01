@@ -117,6 +117,7 @@
   "CancelPendingTask": "Are you sure you want to cancel this pending task?",
   "Categories": "Categories",
   "Category": "Category",
+  "ClientCategory": "Client Category",
   "CertificateValidation": "Certificate Validation",
   "CertificateValidationHelpText": "Change how strict HTTPS certification validation is",
   "ChangeHasNotBeenSavedYet": "Change has not been saved yet",

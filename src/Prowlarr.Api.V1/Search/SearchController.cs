@@ -74,13 +74,22 @@ namespace Prowlarr.Api.V1.Search
 
             try
             {
-                await _downloadService.SendReportToClient(releaseInfo, source, host, indexerDef.Redirect, release.DownloadClientId);
+                var releaseToGrab = (ReleaseInfo)releaseInfo.Clone();
+                releaseToGrab.DownloadClientCategoryOverride = release.ClientCategoryOverride;
+
+                await _downloadService.SendReportToClient(releaseToGrab, source, host, indexerDef.Redirect, release.DownloadClientId);
             }
             catch (ReleaseDownloadException ex)
             {
                 _logger.Error(ex, "Getting release from indexer failed");
 
                 throw new NzbDroneClientException(HttpStatusCode.Conflict, "Getting release from indexer failed");
+            }
+            catch (DownloadClientException ex)
+            {
+                _logger.Error(ex, "Failed to send grabbed release to download client");
+
+                throw new NzbDroneClientException(HttpStatusCode.Conflict, ex.Message);
             }
 
             return Ok(release);
@@ -117,7 +126,10 @@ namespace Prowlarr.Api.V1.Search
 
                     try
                     {
-                        await _downloadService.SendReportToClient(releaseInfo, source, host, indexerDef.Redirect, null);
+                        var releaseToGrab = (ReleaseInfo)releaseInfo.Clone();
+                        releaseToGrab.DownloadClientCategoryOverride = release.ClientCategoryOverride;
+
+                        await _downloadService.SendReportToClient(releaseToGrab, source, host, indexerDef.Redirect, release.DownloadClientId);
                     }
                     catch (ReleaseDownloadException ex)
                     {

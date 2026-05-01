@@ -28,6 +28,7 @@ class SearchFooter extends Component {
       defaultIndexerIds,
       defaultCategories,
       defaultSearchQuery,
+      defaultClientCategoryOverride,
       defaultSearchType,
       defaultSearchLimit,
       defaultSearchOffset
@@ -36,6 +37,7 @@ class SearchFooter extends Component {
     this.state = {
       searchIndexerIds: defaultSearchQueryParams.searchIndexerIds ?? defaultIndexerIds,
       searchCategories: defaultSearchQueryParams.searchCategories ?? defaultCategories,
+      searchClientCategoryOverride: defaultSearchQueryParams.searchClientCategoryOverride ?? defaultClientCategoryOverride,
       searchQuery: (defaultSearchQueryParams.searchQuery ?? defaultSearchQuery) || '',
       searchType: defaultSearchQueryParams.searchType ?? defaultSearchType,
       searchLimit: defaultSearchQueryParams.searchLimit ?? defaultSearchLimit,
@@ -69,6 +71,7 @@ class SearchFooter extends Component {
       defaultIndexerIds,
       defaultCategories,
       defaultSearchQuery,
+      defaultClientCategoryOverride,
       defaultSearchType,
       searchError
     } = this.props;
@@ -76,6 +79,7 @@ class SearchFooter extends Component {
     const {
       searchIndexerIds,
       searchCategories,
+      searchClientCategoryOverride,
       searchType
     } = this.state;
 
@@ -97,6 +101,10 @@ class SearchFooter extends Component {
 
     if (searchCategories !== defaultCategories) {
       newState.searchCategories = defaultCategories;
+    }
+
+    if (searchClientCategoryOverride !== defaultClientCategoryOverride) {
+      newState.searchClientCategoryOverride = defaultClientCategoryOverride;
     }
 
     if (prevProps.isFetching && !isFetching && !searchError) {
@@ -167,11 +175,16 @@ class SearchFooter extends Component {
       searchQuery,
       searchIndexerIds,
       searchCategories,
+      searchClientCategoryOverride,
       newSearch,
       isQueryParameterModalOpen,
       queryModalOptions,
       searchType
     } = this.state;
+    const clientCategoryOptions = [
+      { key: '', value: translate('None') },
+      ...this.props.downloadClientCategoryOptions
+    ];
 
     let icon = icons.SEARCH;
 
@@ -256,6 +269,22 @@ class SearchFooter extends Component {
           />
         </div>
 
+        <div className={styles.indexerContainer}>
+          <SearchFooterLabel
+            label={translate('ClientCategory')}
+            isSaving={false}
+          />
+
+          <FormInputGroup
+            type={inputTypes.SELECT}
+            name="searchClientCategoryOverride"
+            value={searchClientCategoryOverride}
+            values={clientCategoryOptions}
+            isDisabled={isFetching}
+            onChange={this.onInputChange}
+          />
+        </div>
+
         <div className={styles.buttonContainer}>
           <div className={styles.buttonContainerContent}>
             <SearchFooterLabel
@@ -311,9 +340,11 @@ SearchFooter.propTypes = {
   defaultIndexerIds: PropTypes.arrayOf(PropTypes.number).isRequired,
   defaultCategories: PropTypes.arrayOf(PropTypes.number).isRequired,
   defaultSearchQuery: PropTypes.string.isRequired,
+  defaultClientCategoryOverride: PropTypes.string.isRequired,
   defaultSearchType: PropTypes.string.isRequired,
   defaultSearchLimit: PropTypes.number.isRequired,
   defaultSearchOffset: PropTypes.number.isRequired,
+  downloadClientCategoryOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
   selectedCount: PropTypes.number.isRequired,
   itemCount: PropTypes.number.isRequired,
   isFetching: PropTypes.bool.isRequired,

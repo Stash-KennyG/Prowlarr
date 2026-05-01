@@ -10,15 +10,18 @@ function createMapStateToProps() {
   return createSelector(
     (state) => state.releases,
     (state) => state.router.location,
-    (releases, location) => {
+    (state) => state.settings.downloadClients.items,
+    (releases, location, downloadClients) => {
       const {
         searchQuery: defaultSearchQuery,
         searchIndexerIds: defaultIndexerIds,
         searchCategories: defaultCategories,
+        searchClientCategoryOverride: defaultClientCategoryOverride,
         searchType: defaultSearchType,
         searchLimit: defaultSearchLimit,
         searchOffset: defaultSearchOffset
       } = releases.defaults;
+      const configuredDownloadClients = downloadClients || [];
 
       const { params } = parseUrl(location.search);
       const defaultSearchQueryParams = {};
@@ -47,14 +50,27 @@ function createMapStateToProps() {
         defaultSearchQueryParams.searchOffset = Number(params.offset);
       }
 
+      const downloadClientCategoryOptions = Array.from(
+        new Set(
+          configuredDownloadClients
+            .filter((client) => client.enable && client.supportsCategories)
+            .flatMap((client) => (client.categories || []).map((category) => category.clientCategory))
+            .filter(Boolean)
+        )
+      )
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+        .map((category) => ({ key: category, value: category }));
+
       return {
         defaultSearchQueryParams,
         defaultSearchQuery,
         defaultIndexerIds,
         defaultCategories,
+        defaultClientCategoryOverride,
         defaultSearchType,
         defaultSearchLimit,
-        defaultSearchOffset
+        defaultSearchOffset,
+        downloadClientCategoryOptions
       };
     }
   );

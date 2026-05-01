@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using NLog;
 using NzbDrone.Common.Http;
 using NzbDrone.Common.Instrumentation.Extensions;
+using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Download.Clients;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.Indexers;
@@ -49,7 +50,34 @@ namespace NzbDrone.Core.Download
                 ? _downloadClientProvider.Get(downloadClientId.Value)
                 : _downloadClientProvider.GetDownloadClient(release.DownloadProtocol, release.IndexerId);
 
+            ValidateClientCategoryOverride(downloadClient, release.DownloadClientCategoryOverride);
             await SendReportToClient(release, source, host, redirect, downloadClient);
+        }
+
+        private void ValidateClientCategoryOverride(IDownloadClient downloadClient, string clientCategoryOverride)
+        {
+            if (clientCategoryOverride.IsNullOrWhiteSpace())
+            {
+                return;
+            }
+
+            if (downloadClient == null)
+            {
+                throw new DownloadClientUnavailableException("Download client isn't configured yet");
+            }
+
+            if (downloadClient.Definition is not DownloadClientDefinition definition || !downloadClient.SupportsCategories)
+            {
+                throw new DownloadClientException($"Download client '{downloadClient.Definition.Name}' does not support category overrides");
+            }
+
+            var isValidCategory = definition.Categories != null &&
+                                  definition.Categories.Exists((c) => c.ClientCategory == clientCategoryOverride);
+
+            if (!isValidCategory)
+            {
+                throw new DownloadClientException($"Category override '{clientCategoryOverride}' is not configured for download client '{definition.Name}'");
+            }
         }
 
         private async Task SendReportToClient(ReleaseInfo release, string source, string host, bool redirect, IDownloadClient downloadClient)

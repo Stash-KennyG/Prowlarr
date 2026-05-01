@@ -59,6 +59,7 @@ namespace NzbDrone.Core.Parser.Model
         public ICollection<string> Subs { get; set; }
         public ICollection<IndexerCategory> Categories { get; set; }
         public HashSet<IndexerFlag> IndexerFlags { get; set; }
+        public string DownloadClientCategoryOverride { get; set; }
 
         public int Age
         {

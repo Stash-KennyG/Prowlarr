@@ -59,6 +59,9 @@ namespace Prowlarr.Api.V1.Search
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? DownloadClientId { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string ClientCategoryOverride { get; set; }
     }
 
     public static class ReleaseResourceMapper

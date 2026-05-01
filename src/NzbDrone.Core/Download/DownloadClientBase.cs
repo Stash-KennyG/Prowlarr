@@ -68,6 +68,11 @@ namespace NzbDrone.Core.Download
 
         protected string GetCategoryForRelease(ReleaseInfo release)
         {
+            if (release.DownloadClientCategoryOverride.IsNotNullOrWhiteSpace())
+            {
+                return release.DownloadClientCategoryOverride;
+            }
+
             var categories = ((DownloadClientDefinition)Definition).Categories;
             if (categories.Count == 0)
             {
