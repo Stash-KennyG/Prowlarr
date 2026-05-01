@@ -43,6 +43,7 @@ Note: GitHub Issues are for Bugs and Feature Requests Only
 ## Contributors & Developers
 
 [API Documentation](https://prowlarr.com/docs/api/)
+[GHCR Container Publishing](docs/docker-ghcr.md)
 
 This project exists thanks to all the people who contribute.
 
